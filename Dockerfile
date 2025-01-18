@@ -1,3 +1,9 @@
+# Use a Maven image to build the JAR
+FROM maven:3.8.6-openjdk-17 AS build
+WORKDIR /app
+COPY . .
+RUN mvn clean package -DskipTests
+
 # Use an OpenJDK image
 FROM openjdk:17-jdk-slim
 
