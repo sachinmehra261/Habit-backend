@@ -32,4 +32,36 @@ public class Progress {
 	@ManyToOne
 	@JoinColumn(name = "habit_id",nullable = false)
 	private Habit habit;
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public LocalDate getDate() {
+		return date;
+	}
+
+	public void setDate(LocalDate date) {
+		this.date = date;
+	}
+
+	public boolean isCompleted() {
+		return completed;
+	}
+
+	public void setCompleted(boolean completed) {
+		this.completed = completed;
+	}
+
+	public Habit getHabit() {
+		return habit;
+	}
+
+	public void setHabit(Habit habit) {
+		this.habit = habit;
+	}
 }
