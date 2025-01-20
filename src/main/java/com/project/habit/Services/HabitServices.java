@@ -36,12 +36,17 @@ public class HabitServices {
 		try {
 			Optional<User> userOptional = userRepo.findById(userId);
 			if (userOptional.isPresent()) {
-				User user = userOptional.get();
-				habit.setUser(user);
-				habitRepo.save(habit);
-				response.setData(habit);
-				response.setMessage("Habit added successfully");
-				return ResponseEntity.status(HttpStatus.OK).body(response);
+				if(!habit.getName().isEmpty() && !habit.getFrequency().isEmpty()) {
+					User user = userOptional.get();
+					habit.setUser(user);
+					habitRepo.save(habit);
+					response.setData(habit);
+					response.setMessage("Habit added successfully");
+					return ResponseEntity.status(HttpStatus.OK).body(response);
+				}else{
+					response.setMessage("Fill the details correctly!");
+					return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(response);
+				}
 			} else {
 				response.setMessage("User not found");
 				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);

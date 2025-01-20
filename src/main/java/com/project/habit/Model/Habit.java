@@ -27,6 +27,8 @@ public class Habit {
 	@Column(nullable = false)
 	private String frequency;
 
+	private boolean completed;
+
 	@ManyToOne
 	@JoinColumn(name = "user_id")
 	private User user;
@@ -61,5 +63,13 @@ public class Habit {
 
 	public void setUser(User user) {
 		this.user = user;
+	}
+
+	public boolean getCompleted() {
+		return completed;
+	}
+
+	public void setCompleted(boolean completed) {
+		this.completed = completed;
 	}
 }

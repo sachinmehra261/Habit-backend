@@ -1,5 +1,7 @@
 package com.project.habit.Services;
 
+import com.project.habit.Model.Habit;
+import com.project.habit.Repo.HabitRepo;
 import com.project.habit.Repo.UserRepo;
 import com.project.habit.Response.UserResponse;
 import com.project.habit.Model.User;
@@ -10,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.swing.text.html.Option;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -17,6 +20,9 @@ public class UserServices {
 
 	@Autowired
 	UserRepo userRepo;
+
+	@Autowired
+	HabitRepo habitRepo;
 
 	public ResponseEntity<UserResponse<User>> registerUser(User user) {
 		UserResponse<User> response = new UserResponse<User>();
@@ -28,7 +34,7 @@ public class UserServices {
 			Optional<User> savedUser = userRepo.findByEmail(userEmail);
 
 			if (savedUser.isEmpty()) {
-				if (userEmail.isEmpty() || userPassword.isEmpty()) {
+				if (userEmail.isEmpty() || userPassword.isEmpty() || userName.isEmpty()) {
 					response.setMessage("Please fill the data correctly");
 					return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(response);
 				} else if (!userEmail.isEmpty() && !userPassword.isEmpty()) {
@@ -86,16 +92,31 @@ public class UserServices {
 		}
 	}
 
-	public boolean deleteUserById(int id) {
-		Optional<User> userOptional = userRepo.findById(id);
-		if (userOptional.isPresent()) {
-			User userEntry = userOptional.get();
-			userRepo.delete(userEntry);
-			return true;
-		} else {
-			System.out.println("User not Found");
+	public ResponseEntity<UserResponse<User>> deleteUserById(int id) {
+
+		UserResponse<User> response = new UserResponse<>();
+		try {
+			Optional<User> userOptional = userRepo.findById(id);
+			if (userOptional.isPresent()) {
+				User userEntry = userOptional.get();
+				List<Habit> habits = habitRepo.findAllByUserId(id);
+				if(!habits.isEmpty()){
+					for(Habit habit : habits){
+						habit.setUser(null);
+					}
+				}
+				userRepo.delete(userEntry);
+				response.setData(userEntry);
+				response.setMessage("User deleted successfully");
+				return ResponseEntity.status(HttpStatus.OK).body(response);
+			} else {
+				response.setMessage("User not found");
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+			}
+		}catch (Exception e){
+			response.setMessage("Internal Server Error");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 		}
-		return false;
 	}
 
 	public boolean updateUserById(User user) {
