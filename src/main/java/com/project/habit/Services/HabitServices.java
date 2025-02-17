@@ -105,6 +105,25 @@ public class HabitServices {
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 	}
 
+	public ResponseEntity<HabitResponse<Habit>> getHabitById(int habitId) {
+		HabitResponse<Habit> response = new HabitResponse<>();
+		try {
+			Optional<Habit> habitOptional = habitRepo.findById(habitId);
+			if (habitOptional.isPresent()) {
+				Habit habit = habitOptional.get();
+				response.setData(habit);
+				response.setMessage("Habits Fetched Successfully");
+				return ResponseEntity.ok(response); // Use ResponseEntity.ok to return a proper HTTP response
+			} else {
+				response.setMessage("No Habit found");
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+			}
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+	}
+
 	public ResponseEntity<HabitResponse<Habit>> updateHabitById(Habit userHabit, int id) {
 		HabitResponse<Habit> response = new HabitResponse<>();
 		try {
@@ -113,6 +132,7 @@ public class HabitServices {
 				Habit habit = habitOptional.get();
 				habit.setName(userHabit.getName());
 				habit.setFrequency(userHabit.getFrequency());
+				habit.setCompleted(userHabit.getCompleted());
 				habitRepo.save(habit);
 				response.setData(habit);
 				response.setMessage("Habit Updated Successfully");
@@ -125,5 +145,25 @@ public class HabitServices {
 			System.out.println(e);
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 		}
+	}
+
+	public ResponseEntity<HabitResponse<Habit>> markAsCompleted(int habitId) {
+		HabitResponse<Habit> response = new HabitResponse<>();
+		try{
+			Optional<Habit> habitOptional = habitRepo.findById(habitId);
+			if(habitOptional.isPresent()){
+				Habit habit = habitOptional.get();
+				habit.setCompleted(!habit.getCompleted());
+				habitRepo.save(habit);
+				response.setMessage("Habit Updated Successfully");
+				response.setData(habit);
+				return ResponseEntity.status(HttpStatus.OK).body(response);
+			}else{
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+			}
+		}catch (Exception e){
+			System.out.println(e);
+		}
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 	}
 }

@@ -2,6 +2,7 @@ package com.project.habit.Controller;
 
 import java.util.List;
 
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,10 +36,22 @@ public class HabitController {
 		return habitServices.getAllHabitsByUserId(userId);
 		
 	}
+
+	@GetMapping("/getHabitById/{habitId}")
+	public  ResponseEntity<HabitResponse<Habit>> getHabitById(@PathVariable int habitId) {
+		System.out.println(habitId);
+		return habitServices.getHabitById(habitId);
+
+	}
 	
 	@PutMapping("/updateHabit/{id}")
 	public ResponseEntity<HabitResponse<Habit>> updateHabitById(@RequestBody Habit habit,@PathVariable int id) {
 		return habitServices.updateHabitById(habit,id);
+	}
+
+	@PutMapping("/markAsCompleted/{habitId}")
+	public ResponseEntity<HabitResponse<Habit>> markAsCompleted(@PathVariable int habitId){
+		return habitServices.markAsCompleted(habitId);
 	}
 	
 	@DeleteMapping("/deleteHabit/{id}")
